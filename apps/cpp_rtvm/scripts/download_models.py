@@ -18,6 +18,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
+import logging
+
+LOG = logging.getLogger("download")
+
 tmp_dir = "./model_data/"
 dload_models = []
 
