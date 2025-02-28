@@ -31,11 +31,11 @@ python3  scripts/download_models.py
 ```
 
 ### Auto Tuning
-Auto tuning process tunes various operatrors the given model for respective target. Auto tuning for remote devices use ```tvm_rpc``` and we need to setup the rpc environment before we invoke tuning.
+Auto tuning process tunes various operators the given model for respective target. Auto tuning for remote devices use ```tvm_rpc``` and we need to setup the rpc environment before we invoke tuning.
 Please refer below section [RPC setup](#rpc-setup) for the same.
 
-Auto tunng is necessary to obtain best performaning kernels. We can skip this step if we have tuning log already or the tuning cache is available from tophub (implicite by TVM compilation process).
-Below message indicate that there exists some kernels not optimized for the selected target. In this case we can proceed with tuning to best performance.
+Auto tuning is necessary to obtain best performing kernels. We can skip this step if we have tuning log already or the tuning cache is available from tophub (implicit by TVM compilation process).
+Below message indicates that there exists some kernels not optimized for the selected target. In this case we can proceed with tuning to best performance.
 ```One or more operators have not been tuned. Please tune your model for better performance. Use DEBUG logging level to see more details.```
 
 with below environment from [RPC setup](#rpc-setup)
@@ -66,7 +66,7 @@ Please refer to AutoTVM documentation for more details [here](https://tvm.apache
 ### Compile the model
 
 Compilation step generates TVM compiler output artifacts which need to be taken to target device for deployment.
-These artifacts is a compressed archive with kernel shared lib, json with graph description and params binary.
+These artifacts are a compressed archive with kernel shared lib, json with graph description and params binary.
 
 Below command will generate the same
 
@@ -117,7 +117,7 @@ Also copy the cross compiled tool ```rtvm``` and ```libtvm_runtime.so``` to ```d
 ```bash
 Android:/data/local/tmp $ LD_LIBRARY_PATH=./ ./rtvm
 Command line usage
---model        - The folder containing tvm artifacts(mod.so, mod.param, mod.json)
+--model        - The folder containing tvm artifacts(mod.so, mod.params, mod.json)
 --device       - The target device to use {llvm, opencl, cpu, cuda, metal, rocm, vpi, oneapi}
 --input        - Numpy file for the model input (optional and we use random of not given)
 --output       - Numpy file name to dump the model output as numpy
