@@ -81,8 +81,10 @@ endif()
 
 if(BUILD_STATIC_RUNTIME)
   list(APPEND RTVM_LINKER_LIBS -Wl,--whole-archive tvm_runtime -Wl,--no-whole-archive z)
+  list(APPEND RTVM_LINKER_LIBS -Wl,--whole-archive vta -Wl,--no-whole-archive z)
 else()
-  list(APPEND RTVM_LINKER_LIBS tvm_runtime z)
+  list(APPEND RTVM_LINKER_LIBS "tvm_runtime" z)
+  list(APPEND RTVM_LINKER_LIBS "vta" z)
 endif()
 
 target_link_libraries(rtvm ${RTVM_LINKER_LIBS})
