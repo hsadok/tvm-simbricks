@@ -100,10 +100,10 @@ int TVMRunner::Load(void) {
   json_reader.read((char*)json_data.c_str(), json_size);
   json_reader.close();
 
-  // Get ref to graph exeutor
+  // Get ref to graph executor
   auto f_handle = tvm::runtime::Registry::Get("tvm.graph_executor.create");
 
-  // Greate graph runtime
+  // Create graph runtime
   r_graph_handle =
       (*f_handle)(json_data, r_mod_handle, static_cast<int>(GetTVMDevice(r_device)), 0);
 
@@ -113,7 +113,7 @@ int TVMRunner::Load(void) {
   // Read params binary file
   tstart = std::chrono::high_resolution_clock::now();
   std::ifstream params_reader((r_model_path + "/mod.params").c_str(), std::ios::binary);
-  CHECK(!params_reader.fail()) << "Failed to open json file:"
+  CHECK(!params_reader.fail()) << "Failed to open params file:"
                                << (r_model_path + "/mod.params").c_str();
 
   params_reader.seekg(0, std::ios_base::end);
