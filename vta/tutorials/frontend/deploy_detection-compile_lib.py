@@ -25,6 +25,10 @@ Darknet on VTA" tutorial and just compiles the library for the Pretrained Vision
 detection Model.
 """
 
+
+import os
+from os.path import exists
+
 import time
 import tvm
 import vta
@@ -33,6 +37,8 @@ from tvm.relay.testing.darknet import __darknetffi__
 from vta.top import graph_pack
 import sys
 import json
+
+from tvm.contrib import cc, utils, tar
 
 MODEL_NAME = "yolov3-tiny"
 
@@ -141,8 +147,26 @@ def main():
                 f" {build_time:.2f}s!"
             )
 
+            if not exists(darknet_dir):
+                os.makedirs(darknet_dir)
+
             # Export the inference library
-            lib.export_library(f"{darknet_dir}/graphlib_{target_name}.tar")
+            file_name = f"{darknet_dir}/graphlib_{target_name}.tar"
+            lib.export_library(file_name)
+
+            if target_name == "vta":
+                tar_temp = utils.tempdir(custom_path=file_name.replace(".tar", ""))
+                tar.untar(file_name, tar_temp.temp_dir)
+                files = [tar_temp.relpath(x) for x in tar_temp.listdir()]
+                print(files)
+                cc.create_shared(f"{darknet_dir}/mod.so", files)
+
+                graph, lib, params = lib
+                lib.save(f"{darknet_dir}/mod.o")
+                with open(f"{darknet_dir}/mod.json", "w") as graphfile:
+                    graphfile.write(graph)
+                with open(f"{darknet_dir}/mod.params", "wb") as paramfile:
+                    paramfile.write(relay.save_param_dict(params))
 
             # Export network properties
             net_properties = {"neth": net.h, "netw": net.w}
@@ -152,6 +176,8 @@ def main():
                 encoding="utf-8",
             ) as f:
                 json.dump(net_properties, f)
+
+        print(f"Exported {MODEL_NAME} inference graph for {target_name}")
 
 
 if __name__ == "__main__":
