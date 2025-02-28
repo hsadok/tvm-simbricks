@@ -249,7 +249,6 @@ int ExecuteModel(ToolArgs& args) {
       }
       TVMSynchronize(GetTVMDevice(args.device), 0, nullptr);
     }
-    int total_time = 0;
     std::map<std::string, NDArray> input_data_even, input_data_odd;
     std::map<std::string, NDArray> output_data_even, output_data_odd;
 
@@ -323,7 +322,7 @@ int ExecuteModel(ToolArgs& args) {
       runner->Run();
 
       if (!args.zero_copy) {
-        // W/o zero copy we need to invoke explicite data copy
+        // W/o zero copy we need to invoke explicit data copy
         for (auto& elem : mInfo.output_info) {
           runner->GetOutput(elem.first, output_data[elem.first]);
         }
@@ -334,7 +333,7 @@ int ExecuteModel(ToolArgs& args) {
 
       // Timer end
       auto tend = std::chrono::high_resolution_clock::now();
-      LOG(INFO) << "Exec Time:" << static_cast<double>((tend - tstart).count()) / 1e6;
+      LOG(INFO) << "Exec Time: " << static_cast<double>((tend - tstart).count()) / 1e6;
       total_exec_time += static_cast<double>((tend - tstart).count()) / 1e6;
     }
 
@@ -348,7 +347,7 @@ int ExecuteModel(ToolArgs& args) {
       free(output_data[elem.first]);
     }
   } else if (!args.input.empty() && !args.output.empty()) {
-    LOG(INFO) << "Executing with Input:" << args.input << " Output:" << args.output;
+    LOG(INFO) << "Executing with Input: " << args.input << " Output: " << args.output;
     // Set Input from Numpy Input
     runner->SetInput(args.input);
     // Run the model
@@ -359,11 +358,11 @@ int ExecuteModel(ToolArgs& args) {
     LOG(INFO) << "Executing dry run ... ";
     // Set random input for all inputs
     for (auto& elem : mInfo.input_info) {
-      LOG(INFO) << "Set Random Input for :" << elem.first;
+      LOG(INFO) << "Set Random Input for: " << elem.first;
       auto shape = elem.second.first;
       size_t ssize = runner->GetInputMemSize(elem.first);
       char* data = (char*)malloc(ssize);
-      LOG(INFO) << "Random Input Size:" << ssize << "  bytes";
+      LOG(INFO) << "Random Input Size: " << ssize << " bytes";
       runner->SetInput(elem.first, data);
       free(data);
     }
@@ -371,12 +370,12 @@ int ExecuteModel(ToolArgs& args) {
     runner->Run();
     // Get Output and dump few values
     for (auto& elem : mInfo.output_info) {
-      LOG(INFO) << "Get Output for :" << elem.first;
+      LOG(INFO) << "Get Output for: " << elem.first;
       auto shape = elem.second.first;
       size_t ssize = runner->GetOutputMemSize(elem.first);
       char* data = (char*)malloc(ssize);
       runner->GetOutput(elem.first, data);
-      LOG(INFO) << "Output Size:" << ssize << "  bytes";
+      LOG(INFO) << "Output Size: " << ssize << " bytes";
       free(data);
     }
   }
@@ -390,8 +389,8 @@ int ExecuteModel(ToolArgs& args) {
   auto tend = std::chrono::high_resolution_clock::now();
 
   if (args.profile) {
-    LOG(INFO) << "Average ExecTime :" << total_exec_time / args.run_count << " ms";
-    LOG(INFO) << "Unload Time      :" << static_cast<double>((tend - tstart).count()) / 1e6
+    LOG(INFO) << "Average ExecTime : " << total_exec_time / args.run_count << " ms";
+    LOG(INFO) << "Unload Time      : " << static_cast<double>((tend - tstart).count()) / 1e6
               << " ms";
   }
   return 0;
