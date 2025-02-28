@@ -21,6 +21,8 @@
  * \file c_runtime_api.cc
  * \brief Device specific implementations
  */
+#include <dlfcn.h>
+
 #include <dmlc/thread_local.h>
 #include <tvm/runtime/c_backend_api.h>
 #include <tvm/runtime/c_runtime_api.h>
@@ -129,6 +131,18 @@ class DeviceAPIManager {
   DeviceAPI* GetAPI(const std::string name, bool allow_missing) {
     std::string factory = "device_api." + name;
     auto* f = Registry::Get(factory);
+    if (f == nullptr && name == "ext_dev") {
+      // HACK(sadok): Loading libvta.so explicitly here as it was not being
+      // loaded otherwise.
+      void* handle = dlopen("libvta.so", RTLD_LAZY | RTLD_GLOBAL);
+      if (!handle) {
+          ICHECK(allow_missing) << "Failing to load libvta.so. Error: "
+            << dlerror();
+          return nullptr;
+      }
+      f = Registry::Get(factory);
+    }
+
     if (f == nullptr) {
       ICHECK(allow_missing) << "Device API " << name << " is not enabled.";
       return nullptr;
