@@ -58,6 +58,8 @@ DLDeviceType GetTVMDevice(std::string device) {
     return kDLVPI;
   } else if (!device.compare("rocm")) {
     return kDLROCM;
+  } else if (!device.compare("extdev")) {
+    return kDLExtDev;
   } else if (!device.compare("oneapi")) {
     return kDLOneAPI;
   } else {
